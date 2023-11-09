@@ -17,6 +17,7 @@ public class Chunk : MonoBehaviour
     }
     public void GenerateChunk(float xOrg,float yOrg)
     {
+        //Here we are generating perlin noise and using it as alpha channel for decal texture
         //тут мы генерируем перлинов шум по переданным координатам и используем его в качестве альфа канала декаль-текстуры
         ClearProps();
         xOrg = xOrg * scale;
@@ -52,6 +53,7 @@ public class Chunk : MonoBehaviour
 
     void PlaceProps(float seedA,float seedB)
     {
+        //with coordinates we are making seed for generating props (taking generated on start props and placing it on chunk)
         //из координат чанка формируем сид генерации и рандомим пропсы (забираем их из заранее созданного пула и размещаем на чанке
         string _seed = Mathf.Abs(seedA).ToString() + Mathf.Abs(seedB).ToString();
         Debug.Log("props generated with seed "+_seed);
@@ -64,6 +66,7 @@ public class Chunk : MonoBehaviour
             float _posY = Random.Range(-5, 5);
             float _angle= Random.Range(0, 180);
 
+            //looking for props which we need in pool
             //поиск пропса в пулле и установка
             foreach(Transform prop in myChunkManager.propsPool)
             {
@@ -79,7 +82,7 @@ public class Chunk : MonoBehaviour
                     break;
                 }
             }
-        }
+        }                                       //only chunks with those coordinates can have walls, otherwise we can have duplicates
         if (myCoordinates.sqrMagnitude % 2 == 0)//только у чЄтных чанков генерим стены, иначе они будут дублироватьс€
         {
             for(int i=0;i<=270;i+=90)
@@ -87,7 +90,7 @@ public class Chunk : MonoBehaviour
                     InstallWall(i);
         }
     }
-    void ClearProps()
+    void ClearProps()//calling that for regenerating chunks. Putting "old" walls and props back to publick pools
     { //метод вызываем при ре√≈Ќ≈–ј÷»» чанков. ”бираем присутствующие стеночки и пропсы обратно в общий пулл объектов
         foreach(Transform prop in myProps)
         {
@@ -106,7 +109,7 @@ public class Chunk : MonoBehaviour
         myWalls.Clear();
     }
     void InstallWall(float _wallAngle)
-    {
+    {   //taking wall from pool and rotating it(instead of moving)prefab should have center in the middle of chunk
         //достаЄм стенку из пулла и поворачиваем еЄ на нужный градус(префаб стены должен иметь центр в центре чанка)
         Transform wall = myChunkManager.wallsPool[0];
         myChunkManager.wallsPool.Remove(wall);
@@ -117,7 +120,7 @@ public class Chunk : MonoBehaviour
         wall.eulerAngles = new Vector3(0, _wallAngle, 0);
     }
     private void OnDrawGizmos()
-    {//сугубо дебаг дл€ визуального представлени€ границ чанков
+    {//сугубо дебаг дл€ визуального представлени€ границ чанков  Debug thing for visualising chunks borders
         if (myCoordinates.sqrMagnitude % 2 == 0)
             Gizmos.color = Color.white;
         else

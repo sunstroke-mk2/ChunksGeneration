@@ -15,7 +15,7 @@ public class ChunkManager : MonoBehaviour
     public List<Transform> wallsPool = new List<Transform>();
 
     private void Start()
-    {
+    {   //generating objects for pools chunks/props/walls
         //генерируем объекты для пуллов чанков/пропсов/стен
         for(int pr=0;pr<propsLibrary.Length;pr++)
             for(int i =0;i<30;i++)
@@ -39,6 +39,7 @@ public class ChunkManager : MonoBehaviour
         for (int i =0; i < chunkPool.Length; i++)
             chunkPool[i] = GameObject.Instantiate(chunkPrefab).GetComponent<Chunk>();
 
+        //randoming  starting player position. Better to make more difference in values
         //рандомизация стартовой позиции игрока. По хорошему нужен бОльший разброс координат
         player.transform.position = new Vector3(Random.Range(-555, 555), 0, Random.Range(-555, 555));
 
@@ -47,6 +48,7 @@ public class ChunkManager : MonoBehaviour
 
     private void Update()
     {
+        //checking if player "moved" to another chunk; if yes - then starting re-generation
         //если игрок "перешёл" на другой чанк запускаем перегенарацию
         if(getPlayersChunk()!=currentChunk)
         {
@@ -56,6 +58,7 @@ public class ChunkManager : MonoBehaviour
     }
  private void ReGenerateChunks(Vector2Int _pos)
  {
+      //generation chunks around player's position
     //генерация чанков вокруг нового положения игрока
      int _a=0;
      for(int i = -1; i < chunkRenderDist-1; i++)
@@ -63,13 +66,16 @@ public class ChunkManager : MonoBehaviour
          {
                 
              bool chunkExist = false;
+              //checking if chunk already existing - then we dont need to generate it again
              //если чанк с нужными координатами уже есть в пулле, то мы его не генерируем заново
              foreach (Chunk chunk in chunkPool)
              {
-                 if(chunk.myCoordinates==new Vector2Int(_pos.x+i,_pos.y+j))
-                     chunkExist = true;
-             }
-                
+                    if (chunk.myCoordinates == new Vector2Int(_pos.x + i, _pos.y + j))
+                    {
+                        chunkExist = true;
+                        break;
+                    }
+             }             
              if (!chunkExist)
              {
                  chunkPool[_a].transform.position = new Vector3(CHUNKSIZE * (_pos.x + i), 0, CHUNKSIZE * (_pos.y + j));
@@ -78,6 +84,7 @@ public class ChunkManager : MonoBehaviour
              }
          }
  }
+    //getting closest chunk to player
     //получение ближайшего чанка к позиции игрока и присвоение ему "текущего чанка"
     Vector2Int getPlayersChunk()
     {
